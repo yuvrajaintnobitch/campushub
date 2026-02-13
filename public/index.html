@@ -1,0 +1,3194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="theme-color" content="#0A0A1A">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusHub — College Clubs & Events Management Platform</title>
+    <style>
+        /* @import MUST be first in CSS */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6C5CE7;
+            --primary-dark: #5A4BD1;
+            --primary-light: #A29BFE;
+            --secondary: #00CEC9;
+            --accent: #FD79A8;
+            --accent2: #FDCB6E;
+            --dark: #0A0A1A;
+            --dark2: #12122A;
+            --dark3: #1A1A3E;
+            --dark4: #252550;
+            --text: #E8E8F0;
+            --text-dim: #9090B0;
+            --success: #00B894;
+            --warning: #FDCB6E;
+            --danger: #E17055;
+            --glass: rgba(255,255,255,0.05);
+            --glass2: rgba(255,255,255,0.08);
+            --glass3: rgba(255,255,255,0.12);
+            --border: rgba(255,255,255,0.08);
+            --shadow: 0 8px 32px rgba(0,0,0,0.3);
+            --glow: 0 0 40px rgba(108,92,231,0.15);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* === SCROLLBAR === */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--dark2); }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
+
+        /* === SEARCH BAR === */
+        .search-container {
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto 30px;
+        }
+        .search-bar {
+            width: 100%;
+            padding: 14px 20px 14px 48px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .search-bar:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(108,92,231,0.15);
+        }
+        .search-bar::placeholder { color: var(--text-dim); }
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: var(--text-dim);
+        }
+        .search-kbd {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 11px;
+            color: var(--text-dim);
+            background: var(--glass2);
+            border: 1px solid var(--border);
+            padding: 2px 8px;
+            border-radius: 6px;
+            pointer-events: none;
+        }
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--dark2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            margin-top: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+            box-shadow: var(--shadow);
+        }
+        .search-results.active { display: block; }
+        .search-result-item {
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid var(--border);
+        }
+        .search-result-item:last-child { border-bottom: none; }
+        .search-result-item:hover { background: var(--glass); }
+        .search-result-item .result-type {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 50px;
+            background: var(--glass2);
+            color: var(--primary-light);
+        }
+
+        /* === LIGHT MODE === */
+        body.light-mode {
+            --dark: #F5F5FA;
+            --dark2: #FFFFFF;
+            --dark3: #EEEEF5;
+            --dark4: #E0E0EE;
+            --text: #1A1A2E;
+            --text-dim: #6B6B8D;
+            --glass: rgba(0,0,0,0.03);
+            --glass2: rgba(0,0,0,0.05);
+            --glass3: rgba(0,0,0,0.08);
+            --border: rgba(0,0,0,0.08);
+            --shadow: 0 8px 32px rgba(0,0,0,0.08);
+        }
+        body.light-mode .navbar {
+            background: rgba(255,255,255,0.9);
+        }
+        body.light-mode .hero h1 {
+            background: linear-gradient(135deg, #1A1A2E 0%, var(--primary) 50%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+        }
+        body.light-mode .chat-message.sent .msg-content {
+            background: var(--primary);
+            color: white;
+        }
+        body.light-mode .msg-sender { color: var(--primary-dark); }
+
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+        .theme-toggle:hover { background: var(--glass2); }
+
+        /* === NAVBAR === */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 12px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(10,10,26,0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 22px;
+            cursor: pointer;
+        }
+        .navbar-logo .logo-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .navbar-logo span { color: var(--primary-light); }
+        .navbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            list-style: none;
+        }
+        .navbar-nav li {
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-dim);
+            transition: all 0.2s;
+            position: relative;
+        }
+        .navbar-nav li:hover,
+        .navbar-nav li.active {
+            color: var(--text);
+            background: var(--glass2);
+        }
+        .navbar-nav li.active::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .notification-bell {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.2s;
+        }
+        .notification-bell:hover { background: var(--glass2); }
+        .notif-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 18px;
+            height: 18px;
+            background: var(--accent);
+            border-radius: 50%;
+            font-size: 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+        .user-avatar:hover { border-color: var(--primary); }
+
+        /* === HAMBURGER (mobile) === */
+        .hamburger {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s;
+        }
+        .hamburger:hover { background: var(--glass2); }
+
+        /* === PAGES === */
+        .page {
+            display: none;
+            padding-top: 70px;
+            min-height: 100vh;
+        }
+        .page.active {
+            display: block;
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.98);
+                filter: blur(4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        /* Card stagger animation */
+        @keyframes cardSlideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .club-card, .event-card, .feedback-card {
+            animation: cardSlideUp 0.5s ease backwards;
+        }
+        .club-card:nth-child(1), .event-card:nth-child(1) { animation-delay: 0.05s; }
+        .club-card:nth-child(2), .event-card:nth-child(2) { animation-delay: 0.1s; }
+        .club-card:nth-child(3), .event-card:nth-child(3) { animation-delay: 0.15s; }
+        .club-card:nth-child(4), .event-card:nth-child(4) { animation-delay: 0.2s; }
+        .club-card:nth-child(5), .event-card:nth-child(5) { animation-delay: 0.25s; }
+        .club-card:nth-child(6), .event-card:nth-child(6) { animation-delay: 0.3s; }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* === SKELETON LOADING === */
+        .skeleton {
+            background: linear-gradient(90deg, var(--dark3) 25%, var(--dark4) 50%, var(--dark3) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 8px;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .skeleton-card {
+            background: var(--dark2);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+        }
+        .skeleton-line { height: 14px; margin-bottom: 10px; border-radius: 7px; }
+        .skeleton-line.short { width: 40%; }
+        .skeleton-line.medium { width: 70%; }
+        .skeleton-line.full { width: 100%; }
+        .skeleton-circle { width: 52px; height: 52px; border-radius: 14px; }
+
+        /* === HERO === */
+        .hero {
+            padding: 80px 40px 60px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(108,92,231,0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            font-size: 13px;
+            color: var(--primary-light);
+            margin-bottom: 24px;
+        }
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #fff 0%, var(--primary-light) 50%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+        }
+        .hero p {
+            font-size: 18px;
+            color: var(--text-dim);
+            max-width: 600px;
+            margin: 0 auto 36px;
+            line-height: 1.7;
+        }
+        .hero-buttons {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin-bottom: 60px;
+        }
+
+        /* === BUTTONS === */
+        .btn {
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.25s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 20px rgba(108,92,231,0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(108,92,231,0.4);
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-outline:hover {
+            background: var(--glass2);
+            border-color: var(--primary);
+        }
+        .btn-sm { padding: 8px 18px; font-size: 13px; border-radius: 8px; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-secondary {
+            background: var(--glass2);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        /* === STATS === */
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            margin-bottom: 40px;
+        }
+        .stat-item { text-align: center; }
+        .stat-item .number {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--primary-light);
+        }
+        .stat-item .label {
+            font-size: 13px;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+
+        /* === SECTION === */
+        .section { padding: 40px; }
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+        }
+        .section-title { font-size: 24px; font-weight: 700; }
+        .section-subtitle {
+            color: var(--text-dim);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        /* === CLUB CARDS === */
+        .clubs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+        .club-card {
+            background: var(--dark2);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .club-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: var(--glow);
+        }
+        .club-card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+        .club-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        .club-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+        .club-category {
+            display: inline-block;
+            padding: 3px 10px;
+            background: var(--glass);
+            border-radius: 50px;
+            font-size: 11px;
+            color: var(--primary-light);
+            font-weight: 500;
+        }
+        .club-desc {
+            font-size: 13px;
+            color: var(--text-dim);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        .club-stats {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-bottom: 16px;
+        }
+        .club-stats span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .club-actions { display: flex; gap: 8px; }
+
+        /* === EVENT CARDS === */
+        .events-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 20px;
+        }
+        .event-card {
+            background: var(--dark2);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .event-card:hover {
+            border-color: var(--secondary);
+            transform: translateY(-4px);
+            box-shadow: 0 0 40px rgba(0,206,201,0.1);
+        }
+        .event-banner {
+            height: 160px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+        .event-banner .event-date-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+            padding: 8px 12px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .event-date-badge .day { font-size: 22px; font-weight: 800; line-height: 1; }
+        .event-date-badge .month { font-size: 11px; color: var(--secondary); font-weight: 600; }
+        .event-status {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .status-open { background: var(--success); color: white; }
+        .status-closing { background: var(--warning); color: #333; }
+        .status-closed { background: var(--danger); color: white; }
+        .event-body { padding: 20px; }
+        .event-body h3 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+        .event-club-name {
+            font-size: 12px;
+            color: var(--primary-light);
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        .event-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-bottom: 16px;
+        }
+        .event-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .event-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .event-capacity { font-size: 12px; color: var(--text-dim); }
+        .capacity-bar {
+            width: 100px;
+            height: 4px;
+            background: var(--dark4);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+        .capacity-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.5s;
+        }
+
+        /* === DASHBOARD === */
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            min-height: calc(100vh - 70px);
+        }
+        .dash-sidebar {
+            background: var(--dark2);
+            border-right: 1px solid var(--border);
+            padding: 24px 16px;
+        }
+        .dash-sidebar-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+            padding: 0 12px;
+            margin-bottom: 12px;
+            margin-top: 20px;
+        }
+        .dash-sidebar-title:first-child { margin-top: 0; }
+        .dash-menu-item {
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+            color: var(--text-dim);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+            margin-bottom: 2px;
+        }
+        .dash-menu-item:hover { background: var(--glass); color: var(--text); }
+        .dash-menu-item.active { background: var(--glass2); color: var(--text); }
+        .dash-menu-item.active::before {
+            content: '';
+            width: 3px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 3px;
+            margin-right: 4px;
+        }
+        .dash-content {
+            padding: 30px;
+            overflow-y: auto;
+            max-height: calc(100vh - 70px);
+        }
+        .dash-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+        .dash-stat-card {
+            background: var(--dark2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .dash-stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 60px;
+            height: 60px;
+            border-radius: 0 0 0 60px;
+            opacity: 0.1;
+        }
+        .dash-stat-card .icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+        .dash-stat-card .value { font-size: 28px; font-weight: 800; }
+        .dash-stat-card .label { font-size: 13px; color: var(--text-dim); margin-top: 2px; }
+        .dash-stat-card .change { font-size: 12px; margin-top: 6px; font-weight: 600; }
+        .change-up { color: var(--success); }
+        .change-down { color: var(--danger); }
+
+        /* === CALENDAR === */
+        .calendar-container {
+            background: var(--dark2);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+        }
+        .calendar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .calendar-header h3 { font-size: 18px; font-weight: 700; }
+        .calendar-nav { display: flex; gap: 8px; }
+        .calendar-nav button {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            color: var(--text);
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .calendar-nav button:hover { background: var(--glass2); }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+        .calendar-day-header {
+            text-align: center;
+            padding: 8px;
+            font-size: 12px;
+            color: var(--text-dim);
+            font-weight: 600;
+        }
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .calendar-day:hover { background: var(--glass); }
+        .calendar-day.today {
+            background: var(--glass2);
+            border: 1px solid var(--primary);
+        }
+        .calendar-day.has-event::after {
+            content: '';
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--secondary);
+            margin-top: 3px;
+        }
+        .calendar-day.other-month { color: var(--text-dim); opacity: 0.3; }
+
+        /* === CHAT === */
+        .chat-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            height: calc(100vh - 70px);
+            background: var(--dark);
+        }
+        .chat-sidebar {
+            background: var(--dark2);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .chat-sidebar-header h3 { font-size: 18px; font-weight: 700; }
+        .chat-search {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            margin-top: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .chat-search:focus { border-color: var(--primary); }
+        .chat-search::placeholder { color: var(--text-dim); }
+        .chat-channels {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+        .chat-channel {
+            padding: 12px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+            margin-bottom: 2px;
+        }
+        .chat-channel:hover { background: var(--glass); }
+        .chat-channel.active { background: var(--glass2); }
+        .chat-channel-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .chat-channel-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+        .chat-channel-info p {
+            font-size: 12px;
+            color: var(--text-dim);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 160px;
+        }
+        .chat-unread {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            margin-left: auto;
+        }
+        .chat-main { display: flex; flex-direction: column; }
+        .chat-main-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .chat-main-header h3 { font-size: 16px; font-weight: 700; }
+        .online-count {
+            font-size: 12px;
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .online-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .chat-message { display: flex; gap: 12px; max-width: 70%; }
+        .chat-message.sent {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+        .msg-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .msg-content {
+            background: var(--dark2);
+            border: 1px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 14px;
+            border-top-left-radius: 4px;
+        }
+        .chat-message.sent .msg-content {
+            background: var(--primary);
+            border-color: var(--primary);
+            border-top-left-radius: 14px;
+            border-top-right-radius: 4px;
+        }
+        .msg-sender {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary-light);
+            margin-bottom: 4px;
+        }
+        .chat-message.sent .msg-sender { color: rgba(255,255,255,0.7); }
+        .msg-text { font-size: 14px; line-height: 1.5; }
+        .msg-time { font-size: 10px; color: var(--text-dim); margin-top: 4px; }
+        .chat-message.sent .msg-time { color: rgba(255,255,255,0.5); }
+        .chat-input-area {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
+        }
+        .chat-input {
+            flex: 1;
+            padding: 12px 18px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .chat-input:focus { border-color: var(--primary); }
+        .chat-input::placeholder { color: var(--text-dim); }
+        .chat-send-btn {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            background: var(--primary);
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .chat-send-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        /* === TABLES === */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--dark2);
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .data-table th {
+            padding: 14px 18px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            background: var(--dark3);
+            border-bottom: 1px solid var(--border);
+        }
+        .data-table td {
+            padding: 14px 18px;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: var(--glass); }
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-approved { background: rgba(0,184,148,0.15); color: var(--success); }
+        .badge-pending { background: rgba(253,203,110,0.15); color: var(--warning); }
+        .badge-rejected { background: rgba(225,112,85,0.15); color: var(--danger); }
+
+        /* === MODAL === */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: var(--dark2);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 520px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalIn 0.3s ease;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+        .modal p { color: var(--text-dim); font-size: 14px; margin-bottom: 24px; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text);
+        }
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 11px 16px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus { border-color: var(--primary); }
+        .form-textarea { resize: vertical; min-height: 80px; }
+        .form-select { appearance: none; cursor: pointer; }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+
+        /* === CERTIFICATE === */
+        .certificate {
+            background: linear-gradient(135deg, #1a1a3e 0%, #12122a 100%);
+            border: 2px solid var(--primary);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .certificate::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+            border: 1px dashed var(--primary-light);
+            border-radius: 14px;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        .cert-header {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+        .cert-title {
+            font-size: 32px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            margin-bottom: 20px;
+        }
+        .cert-body { font-size: 15px; color: var(--text-dim); line-height: 1.8; }
+        .cert-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text);
+            margin: 10px 0;
+            text-decoration: underline;
+            text-decoration-color: var(--primary);
+            text-underline-offset: 6px;
+        }
+        .cert-event-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--accent2);
+            margin: 8px 0;
+        }
+        .cert-footer {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+        .cert-sign { text-align: center; }
+        .cert-sign .line {
+            width: 120px;
+            height: 1px;
+            background: var(--text-dim);
+            margin: 0 auto 6px;
+        }
+        .cert-sign .name { font-size: 14px; font-weight: 600; }
+        .cert-sign .role { font-size: 11px; color: var(--text-dim); }
+
+        /* === FEEDBACK === */
+        .feedback-card {
+            background: var(--dark2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 14px;
+        }
+        .feedback-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .feedback-user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .feedback-stars {
+            color: var(--accent2);
+            font-size: 14px;
+            margin-left: auto;
+        }
+        .feedback-text {
+            font-size: 14px;
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+
+        /* === NOTIFICATIONS PANEL === */
+        .notif-panel {
+            display: none;
+            position: fixed;
+            top: 60px;
+            right: 20px;
+            width: 360px;
+            max-height: 500px;
+            background: var(--dark2);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            z-index: 1500;
+            overflow: hidden;
+            animation: modalIn 0.2s ease;
+        }
+        .notif-panel.active { display: block; }
+        .notif-panel-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .notif-panel-header h3 { font-size: 16px; font-weight: 700; }
+        .notif-list { max-height: 400px; overflow-y: auto; }
+        .notif-item {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .notif-item:hover { background: var(--glass); }
+        .notif-item:last-child { border-bottom: none; }
+        .notif-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .notif-content h4 { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+        .notif-content p { font-size: 12px; color: var(--text-dim); }
+        .notif-content .notif-time { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+        /* === FILTER BAR === */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .filter-chip {
+            padding: 7px 16px;
+            border-radius: 50px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .filter-chip:hover, .filter-chip.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* === CHARTS (CSS) === */
+        .mini-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            height: 80px;
+            margin-top: 12px;
+        }
+        .chart-bar {
+            flex: 1;
+            border-radius: 4px 4px 0 0;
+            transition: height 0.5s;
+            cursor: pointer;
+            position: relative;
+        }
+        .chart-bar:hover { opacity: 0.8; }
+        .chart-bar .tooltip {
+            display: none;
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            white-space: nowrap;
+        }
+        .chart-bar:hover .tooltip { display: block; }
+
+        /* === TWO COLUMNS === */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .panel {
+            background: var(--dark2);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+        }
+        .panel h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* === BACK TO TOP === */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            box-shadow: 0 4px 20px rgba(108,92,231,0.4);
+            transition: all 0.3s;
+        }
+        .back-to-top:hover { transform: translateY(-3px); }
+        .back-to-top.visible { display: flex; }
+
+        /* === TOAST ANIMATION === */
+        @keyframes toastSlideIn {
+            from { opacity: 0; transform: translateX(40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes toastSlideOut {
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(40px); }
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 900px) {
+            .dashboard-layout { grid-template-columns: 1fr; }
+            .dash-sidebar { display: none; }
+            .chat-layout { grid-template-columns: 1fr; }
+            .chat-sidebar { display: none; }
+            .dash-stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .two-col { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 36px; }
+            .clubs-grid { grid-template-columns: 1fr; }
+            .events-list { grid-template-columns: 1fr; }
+            .stats-row { flex-wrap: wrap; gap: 24px; }
+            .navbar-nav { display: none; }
+            .navbar-nav.mobile-open {
+                display: flex;
+                flex-direction: column;
+                position: fixed;
+                top: 64px;
+                left: 0;
+                right: 0;
+                background: var(--dark2);
+                border-bottom: 1px solid var(--border);
+                padding: 16px;
+                z-index: 999;
+                gap: 4px;
+            }
+            .hamburger { display: flex; }
+            .search-kbd { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="particleCanvas" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+"></canvas>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="navbar-logo" onclick="showPage('home')">
+        <div class="logo-icon">⚡</div>
+        Campus<span>Hub</span>
+    </div>
+    <div class="hamburger" id="hamburgerBtn" onclick="toggleMobileNav()">☰</div>
+    <ul class="navbar-nav" id="mainNav">
+        <li class="active" onclick="showPage('home')">Home</li>
+        <li onclick="showPage('clubs')">Clubs</li>
+        <li onclick="showPage('events')">Events</li>
+        <li onclick="showPage('calendar')">Calendar</li>
+        <li onclick="showPage('chat')">Chat</li>
+        <li onclick="showPage('dashboard')">Dashboard</li>
+        <li onclick="showPage('certificates')">Certificates</li>
+    </ul>
+    <div class="navbar-actions">
+        <div class="theme-toggle" onclick="toggleTheme()" id="themeToggle" title="Toggle theme">🌙</div>
+        <div class="notification-bell" onclick="toggleNotifications()">
+            🔔
+            <span class="notif-badge">5</span>
+        </div>
+        <div class="user-avatar">AS</div>
+    </div>
+</nav>
+
+<!-- NOTIFICATIONS PANEL -->
+<div class="notif-panel" id="notifPanel">
+    <div class="notif-panel-header">
+        <h3>Notifications</h3>
+        <span style="font-size:12px; color:var(--primary-light); cursor:pointer;" onclick="markAllRead()">Mark all read</span>
+    </div>
+    <div class="notif-list">
+        <div class="notif-item">
+            <div class="notif-icon" style="background:rgba(0,206,201,0.15); color:var(--secondary);">📅</div>
+            <div class="notif-content">
+                <h4>Hackathon 2025 starts tomorrow!</h4>
+                <p>Don't forget to check in at 9:00 AM at the Main Auditorium.</p>
+                <div class="notif-time">2 hours ago</div>
+            </div>
+        </div>
+        <div class="notif-item">
+            <div class="notif-icon" style="background:rgba(0,184,148,0.15); color:var(--success);">✅</div>
+            <div class="notif-content">
+                <h4>Membership Approved</h4>
+                <p>You've been accepted into the AI/ML Club!</p>
+                <div class="notif-time">5 hours ago</div>
+            </div>
+        </div>
+        <div class="notif-item">
+            <div class="notif-icon" style="background:rgba(253,121,168,0.15); color:var(--accent);">🏆</div>
+            <div class="notif-content">
+                <h4>Certificate Available</h4>
+                <p>Your certificate for "Web Dev Bootcamp" is ready to download.</p>
+                <div class="notif-time">1 day ago</div>
+            </div>
+        </div>
+        <div class="notif-item">
+            <div class="notif-icon" style="background:rgba(108,92,231,0.15); color:var(--primary);">💬</div>
+            <div class="notif-content">
+                <h4>New message in Coding Club</h4>
+                <p>Rahul: "Hey everyone, meeting at 5 PM today!"</p>
+                <div class="notif-time">2 days ago</div>
+            </div>
+        </div>
+        <div class="notif-item">
+            <div class="notif-icon" style="background:rgba(253,203,110,0.15); color:var(--warning);">⭐</div>
+            <div class="notif-content">
+                <h4>Rate your experience</h4>
+                <p>Please rate the Photography Workshop you attended.</p>
+                <div class="notif-time">3 days ago</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- BACK TO TOP -->
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- ==================== HOME PAGE ==================== -->
+<div class="page active" id="page-home">
+    <div class="hero">
+        <div class="hero-badge">🚀 Built for students, by students</div>
+        <h1>Your Campus Life,<br>One Platform</h1>
+        <p>Discover clubs, never miss events, track your journey — all in one beautifully designed platform built for your college.</p>
+        <div class="hero-buttons">
+            <button class="btn btn-primary" onclick="showPage('clubs')">🔍 Explore Clubs</button>
+            <button class="btn btn-outline" onclick="showPage('events')">📅 Browse Events</button>
+        </div>
+
+        <!-- Search bar (moved from CSS to proper HTML location) -->
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input class="search-bar" type="text" placeholder="Search clubs, events, or people..."
+                id="globalSearch" oninput="handleGlobalSearch(this.value)"
+                onfocus="this.parentElement.querySelector('.search-results').classList.add('active')">
+            <span class="search-kbd">Ctrl+K</span>
+            <div class="search-results" id="searchResults"></div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-item">
+                <div class="number">24</div>
+                <div class="label">Active Clubs</div>
+            </div>
+            <div class="stat-item">
+                <div class="number">156</div>
+                <div class="label">Events This Year</div>
+            </div>
+            <div class="stat-item">
+                <div class="number">2.8K</div>
+                <div class="label">Active Students</div>
+            </div>
+            <div class="stat-item">
+                <div class="number">890</div>
+                <div class="label">Certificates Issued</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Featured Clubs -->
+    <div class="section">
+        <div class="section-header">
+            <div>
+                <div class="section-title">🔥 Featured Clubs</div>
+                <div class="section-subtitle">Most popular clubs this semester</div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="showPage('clubs')">View All →</button>
+        </div>
+        <div class="clubs-grid">
+            <div class="club-card" onclick="openClubModal('coding')">
+                <div class="club-card-header">
+                    <div class="club-icon" style="background:linear-gradient(135deg,#6C5CE7,#A29BFE);">💻</div>
+                    <div>
+                        <h3>Coding Club</h3>
+                        <span class="club-category">Technology</span>
+                    </div>
+                </div>
+                <div class="club-desc">Master programming through workshops, hackathons, and competitive coding sessions. From beginners to advanced.</div>
+                <div class="club-stats">
+                    <span>👥 186 members</span>
+                    <span>📅 12 events</span>
+                    <span>⭐ 4.8</span>
+                </div>
+                <div class="club-actions">
+                    <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); joinClub(this)">Join Club</button>
+                    <button class="btn btn-outline btn-sm">Learn More</button>
+                </div>
+            </div>
+            <div class="club-card">
+                <div class="club-card-header">
+                    <div class="club-icon" style="background:linear-gradient(135deg,#FD79A8,#E84393);">📸</div>
+                    <div>
+                        <h3>Photography Club</h3>
+                        <span class="club-category">Arts & Media</span>
+                    </div>
+                </div>
+                <div class="club-desc">Capture moments, learn techniques, and showcase your art through exhibitions and photo walks across campus.</div>
+                <div class="club-stats">
+                    <span>👥 124 members</span>
+                    <span>📅 8 events</span>
+                    <span>⭐ 4.6</span>
+                </div>
+                <div class="club-actions">
+                    <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); joinClub(this)">Join Club</button>
+                    <button class="btn btn-outline btn-sm">Learn More</button>
+                </div>
+            </div>
+            <div class="club-card">
+                <div class="club-card-header">
+                    <div class="club-icon" style="background:linear-gradient(135deg,#00CEC9,#0984E3);">🤖</div>
+                    <div>
+                        <h3>AI/ML Club</h3>
+                        <span class="club-category">Technology</span>
+                    </div>
+                </div>
+                <div class="club-desc">Explore artificial intelligence and machine learning through projects, paper readings, and industry speaker sessions.</div>
+                <div class="club-stats">
+                    <span>👥 97 members</span>
+                    <span>📅 6 events</span>
+                    <span>⭐ 4.9</span>
+                </div>
+                <div class="club-actions">
+                    <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); joinClub(this)">Join Club</button>
+                    <button class="btn btn-outline btn-sm">Learn More</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Events -->
+    <div class="section">
+        <div class="section-header">
+            <div>
+                <div class="section-title">📅 Upcoming Events</div>
+                <div class="section-subtitle">Don't miss out on what's happening</div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="showPage('events')">View All →</button>
+        </div>
+        <div class="events-list">
+            <div class="event-card" onclick="openEventModal()">
+                <div class="event-banner" style="background:linear-gradient(135deg,#6C5CE7,#A29BFE);">
+                    🏆
+                    <span class="event-status status-open">Open</span>
+                    <div class="event-date-badge">
+                        <div class="day">15</div>
+                        <div class="month">FEB</div>
+                    </div>
+                </div>
+                <div class="event-body">
+                    <h3>Hackathon 2025</h3>
+                    <div class="event-club-name">By Coding Club</div>
+                    <div class="event-meta">
+                        <span>📍 Main Auditorium</span>
+                        <span>🕐 9:00 AM - 9:00 PM</span>
+                        <span>🎫 Free</span>
+                    </div>
+                    <div class="event-footer">
+                        <div class="event-capacity">
+                            <div>78/100 registered</div>
+                            <div class="capacity-bar"><div class="capacity-fill" style="width:78%; background:var(--success);"></div></div>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); registerEvent(this)">Register</button>
+                    </div>
+                </div>
+            </div>
+            <div class="event-card">
+                <div class="event-banner" style="background:linear-gradient(135deg,#FD79A8,#E84393);">
+                    📸
+                    <span class="event-status status-open">Open</span>
+                    <div class="event-date-badge">
+                        <div class="day">20</div>
+                        <div class="month">FEB</div>
+                    </div>
+                </div>
+                <div class="event-body">
+                    <h3>Campus Photo Walk</h3>
+                    <div class="event-club-name">By Photography Club</div>
+                    <div class="event-meta">
+                        <span>📍 Campus Garden</span>
+                        <span>🕐 6:00 AM - 9:00 AM</span>
+                        <span>🎫 Free</span>
+                    </div>
+                    <div class="event-footer">
+                        <div class="event-capacity">
+                            <div>35/50 registered</div>
+                            <div class="capacity-bar"><div class="capacity-fill" style="width:70%; background:var(--warning);"></div></div>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); registerEvent(this)">Register</button>
+                    </div>
+                </div>
+            </div>
+            <div class="event-card">
+                <div class="event-banner" style="background:linear-gradient(135deg,#00CEC9,#0984E3);">
+                    🧠
+                    <span class="event-status status-closing">Closing Soon</span>
+                    <div class="event-date-badge">
+                        <div class="day">25</div>
+                        <div class="month">FEB</div>
+                    </div>
+                </div>
+                <div class="event-body">
+                    <h3>AI Workshop: Intro to LLMs</h3>
+                    <div class="event-club-name">By AI/ML Club</div>
+                    <div class="event-meta">
+                        <span>📍 Lab 301</span>
+                        <span>🕐 2:00 PM - 5:00 PM</span>
+                        <span>🎫 ₹50</span>
+                    </div>
+                    <div class="event-footer">
+                        <div class="event-capacity">
+                            <div>56/60 registered</div>
+                            <div class="capacity-bar"><div class="capacity-fill" style="width:93%; background:var(--danger);"></div></div>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); registerEvent(this)">Register</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== CLUBS PAGE ==================== -->
+<div class="page" id="page-clubs">
+    <div class="section">
+        <div class="section-header">
+            <div>
+                <div class="section-title">🏛️ All Clubs</div>
+                <div class="section-subtitle">Find your community among 24 active clubs</div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openModal('createClubModal')">+ Create Club</button>
+        </div>
+        <div class="filter-bar">
+            <button class="filter-chip active" onclick="filterClubs(this, 'all')">All</button>
+            <button class="filter-chip" onclick="filterClubs(this, 'tech')">Technology</button>
+            <button class="filter-chip" onclick="filterClubs(this, 'arts')">Arts & Media</button>
+            <button class="filter-chip" onclick="filterClubs(this, 'sports')">Sports</button>
+            <button class="filter-chip" onclick="filterClubs(this, 'literary')">Literary</button>
+            <button class="filter-chip" onclick="filterClubs(this, 'social')">Social Service</button>
+            <button class="filter-chip" onclick="filterClubs(this, 'music')">Music & Dance</button>
+        </div>
+        <div class="clubs-grid" id="clubsGrid">
+            <!-- Dynamically populated -->
+        </div>
+    </div>
+</div>
+
+<!-- ==================== EVENTS PAGE ==================== -->
+<div class="page" id="page-events">
+    <div class="section">
+        <div class="section-header">
+            <div>
+                <div class="section-title">📅 Events</div>
+                <div class="section-subtitle">Discover and register for campus events</div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openModal('createEventModal')">+ Create Event</button>
+        </div>
+        <div class="filter-bar">
+            <button class="filter-chip active">All Events</button>
+            <button class="filter-chip">This Week</button>
+            <button class="filter-chip">This Month</button>
+            <button class="filter-chip">Workshops</button>
+            <button class="filter-chip">Competitions</button>
+            <button class="filter-chip">Social</button>
+        </div>
+        <div class="events-list" id="eventsGrid">
+            <!-- Dynamically populated -->
+        </div>
+    </div>
+</div>
+
+<!-- ==================== CALENDAR PAGE ==================== -->
+<div class="page" id="page-calendar">
+    <div class="section">
+        <div class="section-header">
+            <div>
+                <div class="section-title">🗓️ Event Calendar</div>
+                <div class="section-subtitle">Stay on top of all campus activities</div>
+            </div>
+        </div>
+        <div class="two-col">
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <h3 id="calendarMonth">February 2025</h3>
+                    <div class="calendar-nav">
+                        <button onclick="changeMonth(-1)">←</button>
+                        <button onclick="changeMonth(1)">→</button>
+                    </div>
+                </div>
+                <div class="calendar-grid" id="calendarGrid"></div>
+            </div>
+            <div class="panel">
+                <h3>📋 Upcoming This Week</h3>
+                <div id="weekEvents"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== CHAT PAGE ==================== -->
+<div class="page" id="page-chat">
+    <div class="chat-layout">
+        <div class="chat-sidebar">
+            <div class="chat-sidebar-header">
+                <h3>💬 Club Chats</h3>
+                <input class="chat-search" type="text" placeholder="Search conversations...">
+            </div>
+            <div class="chat-channels">
+                <div class="chat-channel active" onclick="selectChat(this, 'Coding Club')">
+                    <div class="chat-channel-icon" style="background:linear-gradient(135deg,#6C5CE7,#A29BFE);">💻</div>
+                    <div class="chat-channel-info">
+                        <h4>Coding Club</h4>
+                        <p>Rahul: Meeting at 5 PM today!</p>
+                    </div>
+                    <span class="chat-unread">3</span>
+                </div>
+                <div class="chat-channel" onclick="selectChat(this, 'Photography Club')">
+                    <div class="chat-channel-icon" style="background:linear-gradient(135deg,#FD79A8,#E84393);">📸</div>
+                    <div class="chat-channel-info">
+                        <h4>Photography Club</h4>
+                        <p>Ananya: Loved the sunset shots!</p>
+                    </div>
+                </div>
+                <div class="chat-channel" onclick="selectChat(this, 'AI/ML Club')">
+                    <div class="chat-channel-icon" style="background:linear-gradient(135deg,#00CEC9,#0984E3);">🤖</div>
+                    <div class="chat-channel-info">
+                        <h4>AI/ML Club</h4>
+                        <p>Dr. Patel: Workshop materials shared</p>
+                    </div>
+                    <span class="chat-unread">1</span>
+                </div>
+                <div class="chat-channel" onclick="selectChat(this, 'Music Club')">
+                    <div class="chat-channel-icon" style="background:linear-gradient(135deg,#FDCB6E,#E17055);">🎵</div>
+                    <div class="chat-channel-info">
+                        <h4>Music Club</h4>
+                        <p>Vikram: Rehearsal moved to Room 5</p>
+                    </div>
+                </div>
+                <div class="chat-channel" onclick="selectChat(this, 'Debate Society')">
+                    <div class="chat-channel-icon" style="background:linear-gradient(135deg,#00B894,#55EFC4);">🎤</div>
+                    <div class="chat-channel-info">
+                        <h4>Debate Society</h4>
+                        <p>Priya: Topic list for next round</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="chat-main">
+            <div class="chat-main-header">
+                <div class="club-icon" style="background:linear-gradient(135deg,#6C5CE7,#A29BFE); width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px;">💻</div>
+                <div>
+                    <h3 id="chatTitle">Coding Club</h3>
+                    <div class="online-count"><span class="online-dot"></span> 23 online</div>
+                </div>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-message">
+                    <div class="msg-avatar" style="background:linear-gradient(135deg,#E84393,#FD79A8);">RK</div>
+                    <div class="msg-content">
+                        <div class="msg-sender">Rahul Kumar</div>
+                        <div class="msg-text">Hey everyone! 🎉 Just a reminder — our hackathon prep meeting is at 5 PM today in Lab 204.</div>
+                        <div class="msg-time">10:32 AM</div>
+                    </div>
+                </div>
+                <div class="chat-message">
+                    <div class="msg-avatar" style="background:linear-gradient(135deg,#00CEC9,#0984E3);">SP</div>
+                    <div class="msg-content">
+                        <div class="msg-sender">Sneha Patel</div>
+                        <div class="msg-text">Thanks Rahul! Should we bring our laptops?</div>
+                        <div class="msg-time">10:35 AM</div>
+                    </div>
+                </div>
+                <div class="chat-message sent">
+                    <div class="msg-avatar" style="background:linear-gradient(135deg,#6C5CE7,#A29BFE);">AS</div>
+                    <div class="msg-content">
+                        <div class="msg-sender">You</div>
+                        <div class="msg-text">Yes, definitely bring your laptops! We'll be brainstorming project ideas and setting up the dev environment. 💻</div>
+                        <div class="msg-time">10:38 AM</div>
+                    </div>
+                </div>
+                <div class="chat-message">
+                    <div class="msg-avatar" style="background:linear-gradient(135deg,#FDCB6E,#E17055);">AV</div>
+                    <div class="msg-content">
+                        <div class="msg-sender">Arjun Verma</div>
+                        <div class="msg-text">Can first-year students join too? I'm new to the club but really excited about the hackathon!</div>
+                        <div class="msg-time">10:42 AM</div>
+                    </div>
+                </div>
+                <div class="chat-message">
+                    <div class="msg-avatar" style="background:linear-gradient(135deg,#E84393,#FD79A8);">RK</div>
+                    <div class="msg-content">
+                        <div class="msg-sender">Rahul Kumar</div>
+                        <div class="msg-text">Absolutely! Everyone is welcome. We'll have mentors for beginners too 🙌</div>
+                        <div class="msg-time">10:45 AM</div>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input class="chat-input" type="text" placeholder="Type a message..." id="chatInput" onkeypress="if(event.key==='Enter')sendMessage()">
+                <button class="chat-send-btn" onclick="sendMessage()">➤</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== DASHBOARD PAGE ==================== -->
+<div class="page" id="page-dashboard">
+    <div class="dashboard-layout">
+        <div class="dash-sidebar">
+            <div class="dash-sidebar-title">Overview</div>
+            <div class="dash-menu-item active" onclick="showDashTab(this, 'overview')">📊 Dashboard</div>
+            <div class="dash-menu-item" onclick="showDashTab(this, 'members')">👥 Members</div>
+            <div class="dash-menu-item" onclick="showDashTab(this, 'myevents')">📅 My Events</div>
+            <div class="dash-sidebar-title">Management</div>
+            <div class="dash-menu-item" onclick="showDashTab(this, 'approvals')">✅ Approvals</div>
+            <div class="dash-menu-item" onclick="showDashTab(this, 'feedback')">⭐ Feedback</div>
+            <div class="dash-menu-item" onclick="showDashTab(this, 'analytics')">📈 Analytics</div>
+            <div class="dash-sidebar-title">Settings</div>
+            <div class="dash-menu-item">⚙️ Club Settings</div>
+            <div class="dash-menu-item">🔗 Social Media</div>
+        </div>
+        <div class="dash-content" id="dashContent">
+            <!-- Overview Tab (default) -->
+            <div id="dash-overview">
+                <h2 style="font-size:22px; font-weight:700; margin-bottom:4px;">Welcome back, Aryan! 👋</h2>
+                <p style="color:var(--text-dim); font-size:14px; margin-bottom:24px;">Here's what's happening in your clubs today.</p>
+
+                <div class="dash-stats-grid">
+                    <div class="dash-stat-card">
+                        <div class="icon" style="background:rgba(108,92,231,0.15); color:var(--primary);">🏛️</div>
+                        <div class="value">4</div>
+                        <div class="label">My Clubs</div>
+                        <div class="change change-up">↑ 1 new this month</div>
+                    </div>
+                    <div class="dash-stat-card">
+                        <div class="icon" style="background:rgba(0,206,201,0.15); color:var(--secondary);">📅</div>
+                        <div class="value">12</div>
+                        <div class="label">Events Attended</div>
+                        <div class="change change-up">↑ 3 this month</div>
+                    </div>
+                    <div class="dash-stat-card">
+                        <div class="icon" style="background:rgba(253,121,168,0.15); color:var(--accent);">🏆</div>
+                        <div class="value">7</div>
+                        <div class="label">Certificates</div>
+                        <div class="change change-up">↑ 2 new</div>
+                    </div>
+                    <div class="dash-stat-card">
+                        <div class="icon" style="background:rgba(253,203,110,0.15); color:var(--warning);">⏳</div>
+                        <div class="value">3</div>
+                        <div class="label">Pending</div>
+                        <div class="change">2 approvals, 1 event</div>
+                    </div>
+                </div>
+
+                <div class="two-col">
+                    <div class="panel">
+                        <h3>📊 Monthly Activity</h3>
+                        <div class="mini-chart">
+                            <div class="chart-bar" style="height:30%; background:var(--primary)"><span class="tooltip">Jan: 3</span></div>
+                            <div class="chart-bar" style="height:45%; background:var(--primary)"><span class="tooltip">Feb: 5</span></div>
+                            <div class="chart-bar" style="height:65%; background:var(--primary)"><span class="tooltip">Mar: 7</span></div>
+                            <div class="chart-bar" style="height:40%; background:var(--primary)"><span class="tooltip">Apr: 4</span></div>
+                            <div class="chart-bar" style="height:80%; background:var(--secondary)"><span class="tooltip">May: 9</span></div>
+                            <div class="chart-bar" style="height:60%; background:var(--primary)"><span class="tooltip">Jun: 6</span></div>
+                            <div class="chart-bar" style="height:90%; background:var(--secondary)"><span class="tooltip">Jul: 11</span></div>
+                            <div class="chart-bar" style="height:55%; background:var(--primary)"><span class="tooltip">Aug: 6</span></div>
+                            <div class="chart-bar" style="height:70%; background:var(--primary)"><span class="tooltip">Sep: 8</span></div>
+                            <div class="chart-bar" style="height:85%; background:var(--secondary)"><span class="tooltip">Oct: 10</span></div>
+                            <div class="chart-bar" style="height:95%; background:linear-gradient(to top, var(--primary), var(--secondary))"><span class="tooltip">Nov: 12</span></div>
+                            <div class="chart-bar" style="height:50%; background:var(--primary)"><span class="tooltip">Dec: 5</span></div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:10px; color:var(--text-dim);">
+                            <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <h3>🔔 Recent Activity</h3>
+                        <div style="display:flex; flex-direction:column; gap:12px;">
+                            <div style="display:flex; align-items:center; gap:10px; font-size:13px;">
+                                <div style="width:8px; height:8px; border-radius:50%; background:var(--success);"></div>
+                                <span>Joined <strong>AI/ML Club</strong></span>
+                                <span style="margin-left:auto; color:var(--text-dim); font-size:11px;">2h ago</span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:10px; font-size:13px;">
+                                <div style="width:8px; height:8px; border-radius:50%; background:var(--secondary);"></div>
+                                <span>Registered for <strong>Hackathon 2025</strong></span>
+                                <span style="margin-left:auto; color:var(--text-dim); font-size:11px;">5h ago</span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:10px; font-size:13px;">
+                                <div style="width:8px; height:8px; border-radius:50%; background:var(--accent);"></div>
+                                <span>Certificate for <strong>Web Dev Bootcamp</strong></span>
+                                <span style="margin-left:auto; color:var(--text-dim); font-size:11px;">1d ago</span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:10px; font-size:13px;">
+                                <div style="width:8px; height:8px; border-radius:50%; background:var(--warning);"></div>
+                                <span>Rated <strong>Photography Workshop</strong> ⭐⭐⭐⭐⭐</span>
+                                <span style="margin-left:auto; color:var(--text-dim); font-size:11px;">2d ago</span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:10px; font-size:13px;">
+                                <div style="width:8px; height:8px; border-radius:50%; background:var(--primary);"></div>
+                                <span>Attended <strong>DSA Workshop</strong></span>
+                                <span style="margin-left:auto; color:var(--text-dim); font-size:11px;">3d ago</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Membership Approvals -->
+                <div class="panel" style="margin-top:20px;">
+                    <h3>✅ Pending Membership Requests</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Club</th>
+                                <th>Department</th>
+                                <th>Requested</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><div style="display:flex;align-items:center;gap:8px;"><div class="feedback-user-avatar" style="background:linear-gradient(135deg,#E84393,#FD79A8); width:30px; height:30px; font-size:11px;">NK</div> Neha Kapoor</div></td>
+                                <td>Coding Club</td>
+                                <td>CSE</td>
+                                <td>Feb 10, 2025</td>
+                                <td><span class="status-badge badge-pending">Pending</span></td>
+                                <td>
+                                    <button class="btn btn-success btn-sm" style="padding:5px 12px; font-size:11px;" onclick="approveMember(this)">Approve</button>
+                                    <button class="btn btn-danger btn-sm" style="padding:5px 12px; font-size:11px;" onclick="rejectMember(this)">Reject</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><div style="display:flex;align-items:center;gap:8px;"><div class="feedback-user-avatar" style="background:linear-gradient(135deg,#0984E3,#00CEC9); width:30px; height:30px; font-size:11px;">VR</div> Vikash Rathore</div></td>
+                                <td>AI/ML Club</td>
+                                <td>IT</td>
+                                <td>Feb 11, 2025</td>
+                                <td><span class="status-badge badge-pending">Pending</span></td>
+                                <td>
+                                    <button class="btn btn-success btn-sm" style="padding:5px 12px; font-size:11px;" onclick="approveMember(this)">Approve</button>
+                                    <button class="btn btn-danger btn-sm" style="padding:5px 12px; font-size:11px;" onclick="rejectMember(this)">Reject</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><div style="display:flex;align-items:center;gap:8px;"><div class="feedback-user-avatar" style="background:linear-gradient(135deg,#FDCB6E,#E17055); width:30px; height:30px; font-size:11px;">PS</div> Priya Sharma</div></td>
+                                <td>Photography Club</td>
+                                <td>ECE</td>
+                                <td>Feb 12, 2025</td>
+                                <td><span class="status-badge badge-pending">Pending</span></td>
+                                <td>
+                                    <button class="btn btn-success btn-sm" style="padding:5px 12px; font-size:11px;" onclick="approveMember(this)">Approve</button>
+                                    <button class="btn btn-danger btn-sm" style="padding:5px 12px; font-size:11px;" onclick="rejectMember(this)">Reject</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Feedback Tab -->
+            <div id="dash-feedback" style="display:none;">
+                <h2 style="font-size:22px; font-weight:700; margin-bottom:20px;">⭐ Event Feedback</h2>
+                <div class="feedback-card">
+                    <div class="feedback-header">
+                        <div class="feedback-user-avatar" style="background:linear-gradient(135deg,#E84393,#FD79A8);">NK</div>
+                        <div>
+                            <div style="font-weight:600; font-size:14px;">Neha Kapoor</div>
+                            <div style="font-size:12px; color:var(--text-dim);">Web Dev Bootcamp</div>
+                        </div>
+                        <div class="feedback-stars">⭐⭐⭐⭐⭐</div>
+                    </div>
+                    <div class="feedback-text">"Amazing workshop! The hands-on approach was exactly what I needed. The mentors were super helpful and patient. Would love more advanced sessions!"</div>
+                </div>
+                <div class="feedback-card">
+                    <div class="feedback-header">
+                        <div class="feedback-user-avatar" style="background:linear-gradient(135deg,#0984E3,#00CEC9);">AV</div>
+                        <div>
+                            <div style="font-weight:600; font-size:14px;">Arjun Verma</div>
+                            <div style="font-size:12px; color:var(--text-dim);">DSA Workshop</div>
+                        </div>
+                        <div class="feedback-stars">⭐⭐⭐⭐</div>
+                    </div>
+                    <div class="feedback-text">"Great content and well-structured. Would have appreciated more time for practice problems. Overall, a valuable experience!"</div>
+                </div>
+                <div class="feedback-card">
+                    <div class="feedback-header">
+                        <div class="feedback-user-avatar" style="background:linear-gradient(135deg,#FDCB6E,#E17055);">SP</div>
+                        <div>
+                            <div style="font-weight:600; font-size:14px;">Sneha Patel</div>
+                            <div style="font-size:12px; color:var(--text-dim);">Photography Workshop</div>
+                        </div>
+                        <div class="feedback-stars">⭐⭐⭐⭐⭐</div>
+                    </div>
+                    <div class="feedback-text">"Absolutely loved it! Learned so much about composition and lighting. The photo walk was the highlight. Already looking forward to the next one!"</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== CERTIFICATES PAGE ==================== -->
+<div class="page" id="page-certificates">
+    <div class="section">
+        <div class="section-header">
+            <div>
+                <div class="section-title">🏆 My Certificates</div>
+                <div class="section-subtitle">Download and share your achievements</div>
+            </div>
+        </div>
+
+        <div class="certificate" id="certPreview">
+            <div class="cert-header">CampusHub • Certificate of Participation</div>
+            <div class="cert-title">Certificate of Achievement</div>
+            <div class="cert-body">
+                This is to certify that
+                <div class="cert-name">Aryan Sharma</div>
+                has successfully participated in
+                <div class="cert-event-name">Hackathon 2025</div>
+                organized by the Coding Club on February 15, 2025
+                <br>and has demonstrated exceptional skills and dedication.
+            </div>
+            <div class="cert-footer">
+                <div class="cert-sign">
+                    <div class="line"></div>
+                    <div class="name">Dr. R. Krishnan</div>
+                    <div class="role">Faculty Advisor</div>
+                </div>
+                <div class="cert-sign">
+                    <div class="line"></div>
+                    <div class="name">Rahul Kumar</div>
+                    <div class="role">Club President</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align:center; margin-top:24px;">
+            <button class="btn btn-primary" onclick="alert('📥 Certificate downloaded as PDF!')">📥 Download PDF</button>
+            <button class="btn btn-outline" onclick="alert('🔗 Share link copied!')">🔗 Share</button>
+        </div>
+
+        <!-- All Certificates List -->
+        <div class="panel" style="margin-top:32px;">
+            <h3>📜 All Certificates</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Club</th>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Hackathon 2025</strong></td>
+                        <td>Coding Club</td>
+                        <td>Feb 15, 2025</td>
+                        <td><span class="status-badge badge-approved">Winner</span></td>
+                        <td><button class="btn btn-primary btn-sm" style="padding:5px 12px; font-size:11px;">📥 Download</button></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Web Dev Bootcamp</strong></td>
+                        <td>Coding Club</td>
+                        <td>Jan 20, 2025</td>
+                        <td><span class="status-badge badge-approved">Participation</span></td>
+                        <td><button class="btn btn-primary btn-sm" style="padding:5px 12px; font-size:11px;">📥 Download</button></td>
+                    </tr>
+                    <tr>
+                        <td><strong>AI Workshop</strong></td>
+                        <td>AI/ML Club</td>
+                        <td>Jan 10, 2025</td>
+                        <td><span class="status-badge badge-approved">Participation</span></td>
+                        <td><button class="btn btn-primary btn-sm" style="padding:5px 12px; font-size:11px;">📥 Download</button></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Photo Walk</strong></td>
+                        <td>Photography Club</td>
+                        <td>Dec 15, 2024</td>
+                        <td><span class="status-badge badge-approved">Participation</span></td>
+                        <td><button class="btn btn-primary btn-sm" style="padding:5px 12px; font-size:11px;">📥 Download</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MODALS ==================== -->
+
+<!-- Create Event Modal -->
+<div class="modal-overlay" id="createEventModal">
+    <div class="modal">
+        <h2>📅 Create New Event</h2>
+        <p>Fill in the details to create and publish your event.</p>
+        <div class="form-group">
+            <label>Event Title</label>
+            <input class="form-input" type="text" placeholder="e.g., Annual Hackathon 2025">
+        </div>
+        <div class="form-group">
+            <label>Club</label>
+            <select class="form-select">
+                <option>Coding Club</option>
+                <option>Photography Club</option>
+                <option>AI/ML Club</option>
+                <option>Music Club</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Date & Time</label>
+            <input class="form-input" type="datetime-local">
+        </div>
+        <div class="form-group">
+            <label>Venue</label>
+            <input class="form-input" type="text" placeholder="e.g., Main Auditorium">
+        </div>
+        <div class="form-group">
+            <label>Max Capacity</label>
+            <input class="form-input" type="number" placeholder="e.g., 100">
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea class="form-textarea" placeholder="Describe your event..."></textarea>
+            <button class="btn btn-outline btn-sm" style="margin-top:8px; font-size:11px;" onclick="this.previousElementSibling.value='Join us for an exciting hands-on workshop where you\'ll learn cutting-edge technologies, collaborate with peers, and build something amazing! Open to all skill levels with mentors available throughout.'">🤖 AI Generate Description</button>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('createEventModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="handleCreateEvent()">Create Event</button>
+        </div>
+    </div>
+</div>
+
+<!-- Create Club Modal -->
+<div class="modal-overlay" id="createClubModal">
+    <div class="modal">
+        <h2>🏛️ Create New Club</h2>
+        <p>Start your own club and build a community.</p>
+        <div class="form-group">
+            <label>Club Name</label>
+            <input class="form-input" type="text" placeholder="e.g., Robotics Club">
+        </div>
+        <div class="form-group">
+            <label>Category</label>
+            <select class="form-select">
+                <option>Technology</option>
+                <option>Arts & Media</option>
+                <option>Sports</option>
+                <option>Literary</option>
+                <option>Social Service</option>
+                <option>Music & Dance</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Objectives</label>
+            <textarea class="form-textarea" placeholder="What does your club aim to achieve?"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea class="form-textarea" placeholder="Describe your club..."></textarea>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('createClubModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="handleCreateClub()">Submit for Approval</button>
+        </div>
+    </div>
+</div>
+
+<!-- Event Detail Modal -->
+<div class="modal-overlay" id="eventDetailModal">
+    <div class="modal" style="max-width:580px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+                <span class="event-status status-open" style="margin-bottom:8px; display:inline-block;">Open</span>
+                <h2>🏆 Hackathon 2025</h2>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="closeModal('eventDetailModal')" style="padding:6px 10px;">✕</button>
+        </div>
+        <p style="color:var(--primary-light); margin-bottom:8px;">Organized by Coding Club</p>
+        <p>A 12-hour coding marathon where teams of 3–4 build innovative solutions to real-world problems. Prizes worth ₹50,000!</p>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:20px 0;">
+            <div style="background:var(--glass); padding:12px; border-radius:10px;">
+                <div style="font-size:12px; color:var(--text-dim);">📅 Date</div>
+                <div style="font-size:14px; font-weight:600;">Feb 15, 2025</div>
+            </div>
+            <div style="background:var(--glass); padding:12px; border-radius:10px;">
+                <div style="font-size:12px; color:var(--text-dim);">🕐 Time</div>
+                <div style="font-size:14px; font-weight:600;">9:00 AM – 9:00 PM</div>
+            </div>
+            <div style="background:var(--glass); padding:12px; border-radius:10px;">
+                <div style="font-size:12px; color:var(--text-dim);">📍 Venue</div>
+                <div style="font-size:14px; font-weight:600;">Main Auditorium</div>
+            </div>
+            <div style="background:var(--glass); padding:12px; border-radius:10px;">
+                <div style="font-size:12px; color:var(--text-dim);">🎫 Price</div>
+                <div style="font-size:14px; font-weight:600;">Free</div>
+            </div>
+        </div>
+        <div style="margin-bottom:16px;">
+            <div style="font-size:13px; color:var(--text-dim); margin-bottom:6px;">Registration: 78/100</div>
+            <div class="capacity-bar" style="width:100%; height:8px;">
+                <div class="capacity-fill" style="width:78%; background:linear-gradient(90deg, var(--success), var(--secondary));"></div>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="alert('🔗 Event link copied! Share on social media.')">🔗 Share</button>
+            <button class="btn btn-primary" onclick="closeModal('eventDetailModal'); showToast('✅ Registered for Hackathon 2025!')">Register Now</button>
+        </div>
+    </div>
+</div>
+
+<!-- Feedback Modal -->
+<div class="modal-overlay" id="feedbackModal">
+    <div class="modal">
+        <h2>⭐ Rate This Event</h2>
+        <p>Your feedback helps us improve future events.</p>
+        <div class="form-group">
+            <label>Rating</label>
+            <div id="starRating" style="display:flex; gap:8px; font-size:28px; cursor:pointer;">
+                <span onclick="setRating(1)">☆</span>
+                <span onclick="setRating(2)">☆</span>
+                <span onclick="setRating(3)">☆</span>
+                <span onclick="setRating(4)">☆</span>
+                <span onclick="setRating(5)">☆</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Your Feedback</label>
+            <textarea class="form-textarea" placeholder="Tell us about your experience..."></textarea>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('feedbackModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="handleSubmitFeedback()">Submit</button>
+        </div>
+    </div>
+</div>
+
+<!-- Auth Modal -->
+<div class="modal-overlay" id="authModal">
+    <div class="modal">
+        <div style="display:flex; gap:0; margin-bottom:24px;">
+            <button class="btn btn-primary" id="loginTab" onclick="showAuthTab('login')" style="flex:1; border-radius:10px 0 0 10px;">Login</button>
+            <button class="btn btn-outline" id="registerTab" onclick="showAuthTab('register')" style="flex:1; border-radius:0 10px 10px 0;">Register</button>
+        </div>
+        <!-- Login Form -->
+        <div id="loginForm">
+            <h2>Welcome Back 👋</h2>
+            <p>Login to access your clubs, events, and more.</p>
+            <div class="form-group">
+                <label>Email</label>
+                <input class="form-input" type="email" id="loginEmail" placeholder="your.email@college.edu">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input class="form-input" type="password" id="loginPassword" placeholder="Enter your password">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal('authModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="handleLogin()">Login</button>
+            </div>
+        </div>
+        <!-- Register Form -->
+        <div id="registerForm" style="display:none;">
+            <h2>Join CampusHub 🚀</h2>
+            <p>Create your account to get started.</p>
+            <div class="form-group">
+                <label>Full Name *</label>
+                <input class="form-input" type="text" id="regName" placeholder="e.g., Aryan Sharma">
+            </div>
+            <div class="form-group">
+                <label>Email *</label>
+                <input class="form-input" type="email" id="regEmail" placeholder="your.email@college.edu">
+            </div>
+            <div class="form-group">
+                <label>Password *</label>
+                <input class="form-input" type="password" id="regPassword" placeholder="At least 6 characters">
+            </div>
+            <div class="form-group">
+                <label>Department</label>
+                <input class="form-input" type="text" id="regDept" placeholder="e.g., CSE, IT, ECE">
+            </div>
+            <div class="form-group">
+                <label>Year</label>
+                <select class="form-select" id="regYear">
+                    <option value="1">1st Year</option>
+                    <option value="2">2nd Year</option>
+                    <option value="3" selected>3rd Year</option>
+                    <option value="4">4th Year</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal('authModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="handleRegister()">Create Account</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" style="
+    display:none;
+    position:fixed;
+    bottom:30px;
+    right:30px;
+    background:var(--dark3);
+    border:1px solid var(--success);
+    padding:14px 24px;
+    border-radius:12px;
+    font-size:14px;
+    font-weight:500;
+    z-index:3000;
+    box-shadow:0 8px 30px rgba(0,184,148,0.2);
+    animation: toastSlideIn 0.3s ease;
+"></div>
+
+<script>
+// ==========================================
+// CAMPUSHUB — FULL JAVASCRIPT (ALL FIXES)
+// ==========================================
+
+// ========== STATIC FALLBACK DATA ==========
+const staticClubs = [
+    { id: '1', name: 'Coding Club', icon: '💻', color: '#6C5CE7,#A29BFE', category: 'Technology', description: 'Master programming through workshops, hackathons, and competitive coding sessions.', member_count: 186, events_count: 12, rating: 4.8 },
+    { id: '2', name: 'Photography Club', icon: '📸', color: '#FD79A8,#E84393', category: 'Arts & Media', description: 'Capture moments, learn techniques, and showcase your art through exhibitions and photo walks.', member_count: 124, events_count: 8, rating: 4.6 },
+    { id: '3', name: 'AI/ML Club', icon: '🤖', color: '#00CEC9,#0984E3', category: 'Technology', description: 'Explore artificial intelligence and machine learning through projects and industry speakers.', member_count: 97, events_count: 6, rating: 4.9 },
+    { id: '4', name: 'Music Club', icon: '🎵', color: '#FDCB6E,#E17055', category: 'Music & Dance', description: 'Express yourself through music. Weekly jam sessions, performances, and music production workshops.', member_count: 78, events_count: 10, rating: 4.7 },
+    { id: '5', name: 'Debate Society', icon: '🎤', color: '#00B894,#55EFC4', category: 'Literary', description: 'Sharpen your argumentation skills through debates, MUNs, and public speaking workshops.', member_count: 65, events_count: 5, rating: 4.5 },
+    { id: '6', name: 'Sports Club', icon: '🏅', color: '#E17055,#D63031', category: 'Sports', description: 'Stay fit and compete! Cricket, basketball, football, and more inter-college tournaments.', member_count: 210, events_count: 15, rating: 4.4 },
+    { id: '7', name: 'NSS Club', icon: '🤝', color: '#74B9FF,#0984E3', category: 'Social Service', description: 'Make a difference through community service, blood donation drives, and social awareness campaigns.', member_count: 150, events_count: 8, rating: 4.6 },
+    { id: '8', name: 'Drama Club', icon: '🎭', color: '#A29BFE,#6C5CE7', category: 'Arts & Media', description: 'Stage plays, street theatre, and improvisation workshops. Unleash your inner performer!', member_count: 55, events_count: 4, rating: 4.8 },
+];
+
+const staticEvents = [
+    { id: '1', title: 'Hackathon 2025', icon: '🏆', color: '#6C5CE7,#A29BFE', event_date: '2025-02-15', start_time: '09:00', end_time: '21:00', venue: 'Main Auditorium', max_participants: 100, registered_count: 78, price: 0, clubs: { name: 'Coding Club' }, is_full: false },
+    { id: '2', title: 'Campus Photo Walk', icon: '📸', color: '#FD79A8,#E84393', event_date: '2025-02-20', start_time: '06:00', end_time: '09:00', venue: 'Campus Garden', max_participants: 50, registered_count: 35, price: 0, clubs: { name: 'Photography Club' }, is_full: false },
+    { id: '3', title: 'AI Workshop: Intro to LLMs', icon: '🧠', color: '#00CEC9,#0984E3', event_date: '2025-02-25', start_time: '14:00', end_time: '17:00', venue: 'Lab 301', max_participants: 60, registered_count: 56, price: 50, clubs: { name: 'AI/ML Club' }, is_full: false },
+    { id: '4', title: 'Open Mic Night', icon: '🎵', color: '#FDCB6E,#E17055', event_date: '2025-03-01', start_time: '18:00', end_time: '21:00', venue: 'Amphitheatre', max_participants: 200, registered_count: 89, price: 0, clubs: { name: 'Music Club' }, is_full: false },
+    { id: '5', title: 'Inter-College Debate', icon: '🎤', color: '#00B894,#55EFC4', event_date: '2025-03-05', start_time: '10:00', end_time: '16:00', venue: 'Seminar Hall', max_participants: 40, registered_count: 40, price: 0, clubs: { name: 'Debate Society' }, is_full: true },
+];
+
+// ========== CONFETTI EFFECT ==========
+function showConfetti() {
+    const colors = ['#6C5CE7', '#00CEC9', '#FD79A8', '#FDCB6E', '#A29BFE', '#55EFC4'];
+    for (let i = 0; i < 50; i++) {
+        const confetti = document.createElement('div');
+        confetti.style.cssText = `
+            position: fixed; top: -10px;
+            left: ${Math.random() * 100}vw;
+            width: ${Math.random() * 8 + 4}px;
+            height: ${Math.random() * 8 + 4}px;
+            background: ${colors[Math.floor(Math.random() * colors.length)]};
+            border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+            z-index: 9999; pointer-events: none;
+            animation: confettiFall ${Math.random() * 2 + 2}s linear forwards;
+        `;
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 4000);
+    }
+}
+
+// ========== SKELETON LOADER ==========
+function showSkeletonLoader(containerId, count = 3) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = Array(count).fill(`
+        <div class="skeleton-card">
+            <div style="display:flex; gap:14px; margin-bottom:14px;">
+                <div class="skeleton skeleton-circle"></div>
+                <div style="flex:1;">
+                    <div class="skeleton skeleton-line medium"></div>
+                    <div class="skeleton skeleton-line short"></div>
+                </div>
+            </div>
+            <div class="skeleton skeleton-line full"></div>
+            <div class="skeleton skeleton-line full"></div>
+            <div class="skeleton skeleton-line medium"></div>
+        </div>
+    `).join('');
+}
+
+// ========== THEME TOGGLE ==========
+function toggleTheme() {
+    document.body.classList.toggle('light-mode');
+    const isLight = document.body.classList.contains('light-mode');
+    document.getElementById('themeToggle').textContent = isLight ? '☀️' : '🌙';
+    localStorage.setItem('campushub_theme', isLight ? 'light' : 'dark');
+}
+
+// Load saved theme
+if (localStorage.getItem('campushub_theme') === 'light') {
+    document.body.classList.add('light-mode');
+    document.getElementById('themeToggle').textContent = '☀️';
+}
+
+// ========== MOBILE NAV TOGGLE ==========
+function toggleMobileNav() {
+    document.getElementById('mainNav').classList.toggle('mobile-open');
+}
+
+// ========== KEYBOARD SHORTCUT (Ctrl+K) ==========
+document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        const searchInput = document.getElementById('globalSearch');
+        if (searchInput) {
+            showPage('home');
+            setTimeout(() => searchInput.focus(), 100);
+        }
+    }
+    // Escape to close modals
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+        document.getElementById('notifPanel').classList.remove('active');
+    }
+});
+
+// ========== BACK TO TOP ==========
+window.addEventListener('scroll', function() {
+    const btn = document.getElementById('backToTop');
+    if (window.scrollY > 400) {
+        btn.classList.add('visible');
+    } else {
+        btn.classList.remove('visible');
+    }
+});
+
+// ========== GLOBAL SEARCH ==========
+let searchTimeout;
+async function handleGlobalSearch(query) {
+    clearTimeout(searchTimeout);
+    const results = document.getElementById('searchResults');
+
+    if (query.length < 2) {
+        results.classList.remove('active');
+        return;
+    }
+
+    searchTimeout = setTimeout(async () => {
+        try {
+            const [clubs, events] = await Promise.all([
+                api(`/clubs?search=${encodeURIComponent(query)}`),
+                api(`/events?search=${encodeURIComponent(query)}`)
+            ]);
+            renderSearchResults(clubs, events, results);
+        } catch (err) {
+            // Fallback to static search
+            const q = query.toLowerCase();
+            const filteredClubs = staticClubs.filter(c => c.name.toLowerCase().includes(q));
+            const filteredEvents = staticEvents.filter(e => e.title.toLowerCase().includes(q));
+            renderSearchResults(filteredClubs, filteredEvents, results);
+        }
+    }, 300);
+}
+
+function renderSearchResults(clubs, events, results) {
+    let html = '';
+    (clubs || []).slice(0, 3).forEach(club => {
+        html += `
+            <div class="search-result-item" onclick="showPage('clubs'); document.getElementById('searchResults').classList.remove('active');">
+                <span style="font-size:24px;">${club.icon}</span>
+                <div>
+                    <div style="font-weight:600; font-size:14px;">${club.name}</div>
+                    <div style="font-size:12px; color:var(--text-dim);">${club.member_count} members</div>
+                </div>
+                <span class="result-type">Club</span>
+            </div>
+        `;
+    });
+    (events || []).slice(0, 3).forEach(ev => {
+        html += `
+            <div class="search-result-item" onclick="showPage('events'); document.getElementById('searchResults').classList.remove('active');">
+                <span style="font-size:24px;">${ev.icon || '📅'}</span>
+                <div>
+                    <div style="font-weight:600; font-size:14px;">${ev.title}</div>
+                    <div style="font-size:12px; color:var(--text-dim);">${ev.event_date}</div>
+                </div>
+                <span class="result-type">Event</span>
+            </div>
+        `;
+    });
+    if (html === '') {
+        html = '<div style="padding:20px; text-align:center; color:var(--text-dim);">No results found</div>';
+    }
+    results.innerHTML = html;
+    results.classList.add('active');
+}
+
+// Close search results when clicking outside
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.search-container')) {
+        const sr = document.getElementById('searchResults');
+        if (sr) sr.classList.remove('active');
+    }
+});
+
+// ========== API CONFIGURATION ==========
+const API_BASE = 'http://localhost:3000/api';
+let authToken = localStorage.getItem('campushub_token');
+let currentUser = JSON.parse(localStorage.getItem('campushub_user') || 'null');
+
+// Universal API helper
+async function api(endpoint, options = {}) {
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {})
+        },
+        ...options
+    };
+    if (options.body && typeof options.body === 'object') {
+        config.body = JSON.stringify(options.body);
+    }
+    const response = await fetch(`${API_BASE}${endpoint}`, config);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Something went wrong');
+    return data;
+}
+
+// ========== AUTH TAB TOGGLE ==========
+function showAuthTab(tab) {
+    if (tab === 'login') {
+        document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('registerForm').style.display = 'none';
+        document.getElementById('loginTab').className = 'btn btn-primary';
+        document.getElementById('registerTab').className = 'btn btn-outline';
+    } else {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('registerForm').style.display = 'block';
+        document.getElementById('loginTab').className = 'btn btn-outline';
+        document.getElementById('registerTab').className = 'btn btn-primary';
+    }
+}
+
+// ========== AUTH FUNCTIONS ==========
+async function handleRegister() {
+    const email = document.getElementById('regEmail').value;
+    const password = document.getElementById('regPassword').value;
+    const name = document.getElementById('regName').value;
+    const department = document.getElementById('regDept').value;
+    const year = parseInt(document.getElementById('regYear').value);
+
+    if (!email || !password || !name) {
+        showToast('⚠️ Please fill in all required fields');
+        return;
+    }
+    try {
+        const data = await api('/auth/register', {
+            method: 'POST',
+            body: { email, password, name, department, year }
+        });
+        authToken = data.token;
+        currentUser = data.user;
+        localStorage.setItem('campushub_token', authToken);
+        localStorage.setItem('campushub_user', JSON.stringify(currentUser));
+        closeModal('authModal');
+        updateUIForLoggedInUser();
+        showToast('✅ Registration successful! Welcome, ' + currentUser.name);
+        showConfetti();
+    } catch (err) {
+        showToast('❌ ' + err.message);
+    }
+}
+
+async function handleLogin() {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+
+    if (!email || !password) {
+        showToast('⚠️ Please enter email and password');
+        return;
+    }
+    try {
+        const data = await api('/auth/login', {
+            method: 'POST',
+            body: { email, password }
+        });
+        authToken = data.token;
+        currentUser = data.user;
+        localStorage.setItem('campushub_token', authToken);
+        localStorage.setItem('campushub_user', JSON.stringify(currentUser));
+        closeModal('authModal');
+        updateUIForLoggedInUser();
+        showToast('✅ Welcome back, ' + currentUser.name + '!');
+    } catch (err) {
+        showToast('❌ ' + err.message);
+    }
+}
+
+function handleLogout() {
+    authToken = null;
+    currentUser = null;
+    localStorage.removeItem('campushub_token');
+    localStorage.removeItem('campushub_user');
+    updateUIForLoggedOutUser();
+    showPage('home');
+    showToast('👋 Logged out successfully');
+}
+
+function updateUIForLoggedInUser() {
+    const avatar = document.querySelector('.user-avatar');
+    if (avatar && currentUser) {
+        const initials = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        avatar.textContent = initials;
+        avatar.title = 'Click to logout: ' + currentUser.name;
+        avatar.onclick = handleLogout;
+    }
+}
+
+function updateUIForLoggedOutUser() {
+    const avatar = document.querySelector('.user-avatar');
+    if (avatar) {
+        avatar.textContent = '👤';
+        avatar.title = 'Login';
+        avatar.onclick = () => openModal('authModal');
+    }
+}
+
+function requireAuth() {
+    if (!authToken || !currentUser) {
+        showToast('⚠️ Please login first!');
+        openModal('authModal');
+        return false;
+    }
+    return true;
+}
+
+// ========== NAVIGATION ==========
+function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const targetPage = document.getElementById('page-' + pageId);
+    if (targetPage) targetPage.classList.add('active');
+
+    document.querySelectorAll('.navbar-nav li').forEach(li => li.classList.remove('active'));
+    const navItems = document.querySelectorAll('.navbar-nav li');
+    const pageMap = { home: 0, clubs: 1, events: 2, calendar: 3, chat: 4, dashboard: 5, certificates: 6 };
+    if (pageMap[pageId] !== undefined && navItems[pageMap[pageId]]) {
+        navItems[pageMap[pageId]].classList.add('active');
+    }
+
+    document.getElementById('notifPanel').classList.remove('active');
+    // Close mobile nav
+    document.getElementById('mainNav').classList.remove('mobile-open');
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Load data
+    if (pageId === 'clubs') loadClubsFromDB();
+    if (pageId === 'events') loadEventsFromDB();
+    if (pageId === 'calendar') initCalendar();
+    if (pageId === 'dashboard') loadDashboard();
+}
+
+// ========== NOTIFICATIONS ==========
+function toggleNotifications() {
+    document.getElementById('notifPanel').classList.toggle('active');
+}
+
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.notification-bell') && !e.target.closest('.notif-panel')) {
+        document.getElementById('notifPanel').classList.remove('active');
+    }
+});
+
+function markAllRead() {
+    showToast('✅ All notifications marked as read');
+    const badge = document.querySelector('.notif-badge');
+    if (badge) {
+        badge.textContent = '0';
+        badge.style.display = 'none';
+    }
+}
+
+// ========== MODALS ==========
+function openModal(id) {
+    document.getElementById(id).classList.add('active');
+}
+function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+}
+
+// ========== TOAST ==========
+function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.style.display = 'block';
+    toast.style.animation = 'toastSlideIn 0.3s ease';
+    clearTimeout(toast._timeout);
+    toast._timeout = setTimeout(() => {
+        toast.style.animation = 'toastSlideOut 0.3s ease forwards';
+        setTimeout(() => { toast.style.display = 'none'; }, 300);
+    }, 3000);
+}
+
+// ========== HELPER: getTimeAgo ==========
+function getTimeAgo(dateStr) {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 60) return mins + 'm ago';
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return hours + 'h ago';
+    const days = Math.floor(hours / 24);
+    return days + 'd ago';
+}
+
+// ========== CLUBS — WITH FALLBACK ==========
+async function loadClubsFromDB(category = 'all') {
+    showSkeletonLoader('clubsGrid', 6);
+    try {
+        const params = category !== 'all' ? `?category=${category}` : '';
+        const clubs = await api(`/clubs${params}`);
+        renderClubsGrid(clubs);
+    } catch (err) {
+        console.log('Using static clubs data');
+        let filtered = staticClubs;
+        if (category !== 'all') {
+            const catMap = { tech: 'Technology', arts: 'Arts & Media', sports: 'Sports', literary: 'Literary', social: 'Social Service', music: 'Music & Dance' };
+            filtered = staticClubs.filter(c => c.category === catMap[category]);
+        }
+        renderClubsGrid(filtered);
+    }
+}
+
+function renderClubsGrid(clubs) {
+    const grid = document.getElementById('clubsGrid');
+    if (!grid) return;
+    grid.innerHTML = clubs.map(club => `
+        <div class="club-card">
+            <div class="club-card-header">
+                <div class="club-icon" style="background:linear-gradient(135deg,${club.color});">${club.icon}</div>
+                <div>
+                    <h3>${club.name}</h3>
+                    <span class="club-category">${club.category}</span>
+                </div>
+            </div>
+            <div class="club-desc">${club.description || 'No description available.'}</div>
+            <div class="club-stats">
+                <span>👥 ${club.member_count} members</span>
+                <span>📅 ${club.events_count || 0} events</span>
+                <span>⭐ ${club.rating}</span>
+            </div>
+            <div class="club-actions">
+                <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); joinClub(this)">Join Club</button>
+                <button class="btn btn-outline btn-sm">Learn More</button>
+            </div>
+        </div>
+    `).join('');
+    if (clubs.length === 0) {
+        grid.innerHTML = '<div style="text-align:center; padding:60px; color:var(--text-dim); grid-column:1/-1;">No clubs found in this category.</div>';
+    }
+}
+
+function filterClubs(el, category) {
+    document.querySelectorAll('#page-clubs .filter-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    loadClubsFromDB(category);
+}
+
+// ========== EVENTS — WITH FALLBACK ==========
+async function loadEventsFromDB() {
+    showSkeletonLoader('eventsGrid', 4);
+    try {
+        const events = await api('/events?upcoming=true');
+        renderEventsGrid(events);
+    } catch (err) {
+        console.log('Using static events data');
+        renderEventsGrid(staticEvents);
+    }
+}
+
+function renderEventsGrid(events) {
+    const grid = document.getElementById('eventsGrid');
+    if (!grid) return;
+    grid.innerHTML = events.map(ev => {
+        const pct = ev.max_participants > 0 ? Math.round((ev.registered_count / ev.max_participants) * 100) : 0;
+        const barColor = pct > 90 ? 'var(--danger)' : pct > 60 ? 'var(--warning)' : 'var(--success)';
+        const statusClass = ev.is_full ? 'status-closed' : pct > 80 ? 'status-closing' : 'status-open';
+        const statusText = ev.is_full ? 'Full' : pct > 80 ? 'Closing Soon' : 'Open';
+        const dateParts = ev.event_date ? ev.event_date.split('-') : ['2025','01','01'];
+        const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+        const day = parseInt(dateParts[2]);
+        const month = months[parseInt(dateParts[1]) - 1];
+
+        return `
+            <div class="event-card" onclick="openEventModal()">
+                <div class="event-banner" style="background:linear-gradient(135deg,${ev.color || '#6C5CE7,#A29BFE'});">
+                    ${ev.icon || '📅'}
+                    <span class="event-status ${statusClass}">${statusText}</span>
+                    <div class="event-date-badge">
+                        <div class="day">${day}</div>
+                        <div class="month">${month}</div>
+                    </div>
+                </div>
+                <div class="event-body">
+                    <h3>${ev.title}</h3>
+                    <div class="event-club-name">By ${ev.clubs ? ev.clubs.name : 'Unknown Club'}</div>
+                    <div class="event-meta">
+                        <span>📍 ${ev.venue || 'TBA'}</span>
+                        <span>🕐 ${ev.start_time || ''} - ${ev.end_time || ''}</span>
+                        <span>🎫 ${ev.price > 0 ? '₹' + ev.price : 'Free'}</span>
+                    </div>
+                    <div class="event-footer">
+                        <div class="event-capacity">
+                            <div>${ev.registered_count}/${ev.max_participants} registered</div>
+                            <div class="capacity-bar"><div class="capacity-fill" style="width:${pct}%; background:${barColor};"></div></div>
+                        </div>
+                        <button class="btn btn-primary btn-sm"
+                            onclick="event.stopPropagation(); registerEvent(this)"
+                            ${ev.is_full ? 'disabled style="opacity:0.5"' : ''}>
+                            ${ev.is_full ? 'Full' : 'Register'}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    if (events.length === 0) {
+        grid.innerHTML = '<div style="text-align:center; padding:60px; color:var(--text-dim);">No upcoming events. Check back later!</div>';
+    }
+}
+
+// ========== STATIC BUTTON HANDLERS (fallback for home page) ==========
+function joinClub(btn) {
+    btn.textContent = '✅ Joined!';
+    btn.style.background = 'var(--success)';
+    btn.disabled = true;
+    showToast('✅ You joined the club!');
+    showConfetti();
+}
+
+function registerEvent(btn) {
+    btn.textContent = '✅ Registered';
+    btn.style.background = 'var(--success)';
+    btn.disabled = true;
+    showToast('✅ Successfully registered!');
+}
+
+function openClubModal(clubName) {
+    // For static home page club cards
+    openModal('eventDetailModal');
+}
+
+function openEventModal() {
+    openModal('eventDetailModal');
+}
+
+function selectChat(el, name) {
+    document.querySelectorAll('.chat-channel').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('chatTitle').textContent = name;
+}
+
+// ========== APPROVE / REJECT (static fallback) ==========
+function approveMember(btn) {
+    const row = btn.closest('tr');
+    const statusCell = row.querySelector('.status-badge');
+    statusCell.className = 'status-badge badge-approved';
+    statusCell.textContent = 'Approved';
+    btn.parentElement.innerHTML = '<span style="color:var(--success); font-size:12px;">✅ Done</span>';
+    showToast('✅ Member approved!');
+}
+
+function rejectMember(btn) {
+    const row = btn.closest('tr');
+    const statusCell = row.querySelector('.status-badge');
+    statusCell.className = 'status-badge badge-rejected';
+    statusCell.textContent = 'Rejected';
+    btn.parentElement.innerHTML = '<span style="color:var(--danger); font-size:12px;">❌ Done</span>';
+    showToast('❌ Member rejected');
+}
+
+// ========== CREATE EVENT ==========
+async function handleCreateEvent() {
+    const modal = document.getElementById('createEventModal');
+    const title = modal.querySelector('input[placeholder*="Hackathon"]')?.value;
+    if (!title) {
+        showToast('⚠️ Please enter an event title');
+        return;
+    }
+    closeModal('createEventModal');
+    showToast('✅ Event created successfully!');
+    showConfetti();
+}
+
+// ========== CREATE CLUB ==========
+async function handleCreateClub() {
+    const modal = document.getElementById('createClubModal');
+    const name = modal.querySelector('input[placeholder*="Robotics"]')?.value;
+    if (!name) {
+        showToast('⚠️ Please enter a club name');
+        return;
+    }
+    closeModal('createClubModal');
+    showToast('✅ Club submitted for approval!');
+}
+
+// ========== CHAT SEND ==========
+function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    const container = document.getElementById('chatMessages');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'chat-message sent';
+    msgDiv.innerHTML = `
+        <div class="msg-avatar" style="background:linear-gradient(135deg,#6C5CE7,#A29BFE);">AS</div>
+        <div class="msg-content">
+            <div class="msg-sender">You</div>
+            <div class="msg-text">${text}</div>
+            <div class="msg-time">Just now</div>
+        </div>
+    `;
+    container.appendChild(msgDiv);
+    input.value = '';
+    container.scrollTop = container.scrollHeight;
+}
+
+// ========== STAR RATING ==========
+function setRating(n) {
+    const stars = document.querySelectorAll('#starRating span');
+    stars.forEach((s, i) => { s.textContent = i < n ? '★' : '☆'; });
+}
+
+// ========== FEEDBACK SUBMIT ==========
+function handleSubmitFeedback() {
+    const stars = document.querySelectorAll('#starRating span');
+    let rating = 0;
+    stars.forEach((s, i) => { if (s.textContent === '★') rating = i + 1; });
+
+    if (rating === 0) {
+        showToast('⚠️ Please select a rating');
+        return;
+    }
+    closeModal('feedbackModal');
+    showToast('⭐ Thanks for your feedback!');
+}
+
+// ========== CALENDAR ==========
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
+
+function initCalendar() {
+    renderCalendar();
+    renderWeekEvents();
+}
+
+function renderCalendar() {
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    document.getElementById('calendarMonth').textContent = `${months[currentMonth]} ${currentYear}`;
+    const grid = document.getElementById('calendarGrid');
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    let html = days.map(d => `<div class="calendar-day-header">${d}</div>`).join('');
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const daysInPrev = new Date(currentYear, currentMonth, 0).getDate();
+    const today = new Date();
+
+    const eventDaysThisMonth = staticEvents
+        .filter(ev => {
+            const d = new Date(ev.event_date);
+            return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+        })
+        .map(ev => new Date(ev.event_date).getDate());
+
+    for (let i = firstDay - 1; i >= 0; i--) {
+        html += `<div class="calendar-day other-month">${daysInPrev - i}</div>`;
+    }
+    for (let d = 1; d <= daysInMonth; d++) {
+        const isToday = (d === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear());
+        const hasEvent = eventDaysThisMonth.includes(d);
+        html += `<div class="calendar-day${isToday ? ' today' : ''}${hasEvent ? ' has-event' : ''}">${d}</div>`;
+    }
+    const totalCells = firstDay + daysInMonth;
+    const remaining = 42 - totalCells;
+    for (let i = 1; i <= remaining; i++) {
+        html += `<div class="calendar-day other-month">${i}</div>`;
+    }
+    grid.innerHTML = html;
+}
+
+function changeMonth(delta) {
+    currentMonth += delta;
+    if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+    if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+    renderCalendar();
+}
+
+function renderWeekEvents() {
+    const container = document.getElementById('weekEvents');
+    if (!container) return;
+    container.innerHTML = staticEvents.slice(0, 5).map(ev => `
+        <div style="display:flex; align-items:center; gap:12px; padding:12px; background:var(--glass); border-radius:10px; margin-bottom:10px; border-left:3px solid var(--primary);">
+            <div>
+                <div style="font-size:14px; font-weight:600;">${ev.title}</div>
+                <div style="font-size:12px; color:var(--text-dim);">${ev.clubs?.name || ''} • ${ev.event_date} • ${ev.start_time || ''}</div>
+            </div>
+            <button class="btn btn-primary btn-sm" style="margin-left:auto; padding:5px 12px; font-size:11px;"
+                onclick="registerEvent(this)">Register</button>
+        </div>
+    `).join('');
+}
+
+// ========== DASHBOARD ==========
+function loadDashboard() {
+    // Already rendered statically in HTML
+}
+
+// ========== DASHBOARD TABS ==========
+function showDashTab(el, tab) {
+    document.querySelectorAll('.dash-menu-item').forEach(m => m.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('dash-overview').style.display = 'none';
+    const feedbackEl = document.getElementById('dash-feedback');
+    if (feedbackEl) feedbackEl.style.display = 'none';
+
+    if (tab === 'overview') {
+        document.getElementById('dash-overview').style.display = 'block';
+    } else if (tab === 'feedback') {
+        if (feedbackEl) feedbackEl.style.display = 'block';
+    } else {
+        document.getElementById('dash-overview').style.display = 'block';
+        showToast('📋 ' + tab.charAt(0).toUpperCase() + tab.slice(1) + ' view — coming soon!');
+    }
+}
+
+// ========== INIT ==========
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+        if (e.target === this) this.classList.remove('active');
+    });
+});
+
+// Check if user is logged in
+if (currentUser && authToken) {
+    updateUIForLoggedInUser();
+} else {
+    updateUIForLoggedOutUser();
+}
+
+// ========== PARTICLE BACKGROUND ==========
+(function() {
+    const canvas = document.getElementById('particleCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    class Particle {
+        constructor() { this.reset(); }
+        reset() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 2 + 0.5;
+            this.speedX = (Math.random() - 0.5) * 0.5;
+            this.speedY = (Math.random() - 0.5) * 0.5;
+            this.opacity = Math.random() * 0.5 + 0.1;
+            this.color = ['108,92,231', '0,206,201', '253,121,168', '162,155,254'][Math.floor(Math.random() * 4)];
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
+        }
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${this.color},${this.opacity})`;
+            ctx.fill();
+        }
+    }
+
+    for (let i = 0; i < 80; i++) particles.push(new Particle());
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 120) {
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.strokeStyle = `rgba(108,92,231,${0.08 * (1 - dist / 120)})`;
+                    ctx.lineWidth = 0.5;
+                    ctx.stroke();
+                }
+            }
+        }
+        particles.forEach(p => { p.update(); p.draw(); });
+        requestAnimationFrame(animate);
+    }
+    animate();
+})();
+</script>
+</body>
+</html>
