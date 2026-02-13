@@ -22,7 +22,7 @@
 
 <br>
 
-[🚀 Live Demo]([https://your-deployment-url.onrender.com](https://campushub-6q4c.onrender.com/)) · [🐛 Report Bug](https://github.com/YOUR_USERNAME/campushub/issues) · [✨ Request Feature](https://github.com/YOUR_USERNAME/campushub/issues)
+[🚀 Live Demo]([(https://campushub-6q4c.onrender.com/)) · [🐛 Report Bug](https://github.com/YOUR_USERNAME/campushub/issues) · [✨ Request Feature](https://github.com/YOUR_USERNAME/campushub/issues)
 
 </div>
 
