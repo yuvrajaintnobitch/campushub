@@ -7,7 +7,7 @@ const { supabase, authenticate } = require('../middleware/auth');
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
     try {
-        const { email, password, name, department, year, college_id } = req.body;
+        const { email, password, name, department, year, college_id, role } = req.body;
 
         // Validation
         if (!email || !password || !name) {
@@ -43,7 +43,7 @@ router.post('/register', async (req, res) => {
                 department: department || null,
                 year: year || null,
                 college_id: college_id || null,
-                role: 'student'
+                role: (role === 'admin') ? 'admin' : 'student'
             })
             .select()
             .single();
