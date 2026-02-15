@@ -112,11 +112,10 @@
 
 | Layer | Technology |
 |-------|-----------|
-| **Frontend** | HTML5, CSS3, Vanilla JavaScript |
+| **Frontend** | HTML, CSS, JavaScript |
 | **Backend** | Node.js, Express.js |
 | **Database** | Supabase (PostgreSQL) |
-| **Auth** | JWT (JSON Web Tokens) |
-| **Deployment** | Render / Railway |
-| **Design** | Custom CSS with CSS Variables |
+| **Auth** | JWT (JSON Web Tokens), bCrypt, Brevo Email OTP |
+| **Hosting** | Render, Github |
 
 </div>
