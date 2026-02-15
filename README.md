@@ -93,19 +93,6 @@
 - Role-based access (Student, Club Lead, Admin)
 - Profile management
 
-### 🎨 UI/UX Features
-- 🌙 Dark/Light mode toggle
-- 🔍 Global search with keyboard shortcut (Ctrl+K)
-- ✨ Particle animation background
-- 🎊 Confetti celebrations on actions
-- 📱 Fully responsive design
-- ⬆️ Back-to-top button
-- 🦴 Skeleton loading states
-- 🔔 Notification system
-- 🍞 Toast notifications
-
----
-
 ## 🛠️ Tech Stack
 
 <div align="center">
