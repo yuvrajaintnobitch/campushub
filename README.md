@@ -115,7 +115,7 @@
 | **Frontend** | HTML, CSS, JavaScript |
 | **Backend** | Node.js, Express.js |
 | **Database** | Supabase (PostgreSQL) |
-| **Auth** | JWT (JSON Web Tokens), bCrypt, Brevo Email OTP |
+| **Auth** | JWT (JSON Web Tokens), bcrypt, Brevo Email OTP |
 | **Hosting** | Render, Github |
 
 </div>
