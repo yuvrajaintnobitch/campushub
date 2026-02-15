@@ -2,17 +2,47 @@ const express = require('express');
 const router = express.Router();
 const { supabase, authenticate, optionalAuth } = require('../middleware/auth');
 
-// GET /api/events - List events
+// GET /api/events/my-registrations - MUST BE BEFORE /:id
+router.get('/my-registrations', authenticate, async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('event_registrations')
+            .select(`
+                id, status, registered_at, checked_in_at,
+                events (
+                    id, title, description, event_date, start_time, end_time,
+                    venue, event_type, max_participants, price, icon, color, status,
+                    clubs (id, name, icon, color)
+                )
+            `)
+            .eq('user_id', req.userId)
+            .neq('status', 'cancelled')
+            .order('registered_at', { ascending: false });
+
+        if (error) throw error;
+
+        const events = (data || []).map(reg => ({
+            ...reg.events,
+            registration_id: reg.id,
+            registration_status: reg.status,
+            registered_at: reg.registered_at,
+            checked_in_at: reg.checked_in_at
+        }));
+
+        res.json(events);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// GET /api/events
 router.get('/', async (req, res) => {
     try {
         const { club_id, status, upcoming, search, limit: lim } = req.query;
 
         let query = supabase
             .from('events')
-            .select(`
-                *,
-                clubs (id, name, icon, color)
-            `)
+            .select(`*, clubs (id, name, icon, color)`)
             .order('event_date', { ascending: true });
 
         if (club_id) query = query.eq('club_id', club_id);
@@ -28,7 +58,6 @@ router.get('/', async (req, res) => {
         const { data: events, error } = await query;
         if (error) throw error;
 
-        // Get registration counts for each event
         const eventsWithCounts = await Promise.all(events.map(async (event) => {
             const { count } = await supabase
                 .from('event_registrations')
@@ -49,15 +78,12 @@ router.get('/', async (req, res) => {
     }
 });
 
-// GET /api/events/:id - Get single event
+// GET /api/events/:id
 router.get('/:id', optionalAuth, async (req, res) => {
     try {
         const { data: event, error } = await supabase
             .from('events')
-            .select(`
-                *,
-                clubs (id, name, icon, color, description)
-            `)
+            .select(`*, clubs (id, name, icon, color, description)`)
             .eq('id', req.params.id)
             .single();
 
@@ -65,14 +91,12 @@ router.get('/:id', optionalAuth, async (req, res) => {
             return res.status(404).json({ error: 'Event not found.' });
         }
 
-        // Get registration count
         const { count: registeredCount } = await supabase
             .from('event_registrations')
             .select('id', { count: 'exact' })
             .eq('event_id', req.params.id)
             .neq('status', 'cancelled');
 
-        // Check if current user is registered
         let userRegistration = null;
         if (req.userId) {
             const { data: reg } = await supabase
@@ -84,7 +108,6 @@ router.get('/:id', optionalAuth, async (req, res) => {
             userRegistration = reg;
         }
 
-        // Get feedback summary
         const { data: feedbackData } = await supabase
             .from('feedback')
             .select('rating')
@@ -109,7 +132,7 @@ router.get('/:id', optionalAuth, async (req, res) => {
     }
 });
 
-// POST /api/events - Create event
+// POST /api/events
 router.post('/', authenticate, async (req, res) => {
     try {
         const {
@@ -125,7 +148,6 @@ router.post('/', authenticate, async (req, res) => {
             });
         }
 
-        // Check if user is lead of this club or admin
         const { data: membership } = await supabase
             .from('club_memberships')
             .select('role')
@@ -157,7 +179,6 @@ router.post('/', authenticate, async (req, res) => {
 
         if (error) throw error;
 
-        // Notify club members
         const { data: members } = await supabase
             .from('club_memberships')
             .select('user_id')
@@ -181,10 +202,9 @@ router.post('/', authenticate, async (req, res) => {
     }
 });
 
-// POST /api/events/:id/register - Register for event
+// POST /api/events/:id/register
 router.post('/:id/register', authenticate, async (req, res) => {
     try {
-        // Check if event exists and has capacity
         const { data: event } = await supabase
             .from('events')
             .select('*')
@@ -195,7 +215,6 @@ router.post('/:id/register', authenticate, async (req, res) => {
         if (event.status === 'cancelled') return res.status(400).json({ error: 'Event is cancelled.' });
         if (event.status === 'completed') return res.status(400).json({ error: 'Event has already ended.' });
 
-        // Check capacity
         const { count: registeredCount } = await supabase
             .from('event_registrations')
             .select('id', { count: 'exact' })
@@ -203,10 +222,9 @@ router.post('/:id/register', authenticate, async (req, res) => {
             .neq('status', 'cancelled');
 
         if (registeredCount >= event.max_participants) {
-            return res.status(400).json({ error: 'Event is full. No spots available.' });
+            return res.status(400).json({ error: 'Event is full.' });
         }
 
-        // Check if already registered
         const { data: existing } = await supabase
             .from('event_registrations')
             .select('id, status')
@@ -215,12 +233,10 @@ router.post('/:id/register', authenticate, async (req, res) => {
             .single();
 
         if (existing && existing.status !== 'cancelled') {
-            return res.status(409).json({ error: 'You are already registered for this event.' });
+            return res.status(409).json({ error: 'Already registered.' });
         }
 
-        // Register
         if (existing) {
-            // Re-register if previously cancelled
             await supabase
                 .from('event_registrations')
                 .update({ status: 'registered', registered_at: new Date() })
@@ -233,7 +249,6 @@ router.post('/:id/register', authenticate, async (req, res) => {
             });
         }
 
-        // Create notification
         await supabase.from('notifications').insert({
             user_id: req.userId,
             type: 'event_registered',
@@ -252,7 +267,7 @@ router.post('/:id/register', authenticate, async (req, res) => {
     }
 });
 
-// DELETE /api/events/:id/register - Cancel registration
+// DELETE /api/events/:id/register
 router.delete('/:id/register', authenticate, async (req, res) => {
     try {
         const { error } = await supabase
@@ -262,14 +277,13 @@ router.delete('/:id/register', authenticate, async (req, res) => {
             .eq('user_id', req.userId);
 
         if (error) throw error;
-
         res.json({ message: 'Registration cancelled.' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// POST /api/events/:id/checkin - Check in attendee
+// POST /api/events/:id/checkin
 router.post('/:id/checkin', authenticate, async (req, res) => {
     try {
         const { user_id } = req.body;
@@ -277,18 +291,14 @@ router.post('/:id/checkin', authenticate, async (req, res) => {
 
         const { data, error } = await supabase
             .from('event_registrations')
-            .update({
-                status: 'attended',
-                checked_in_at: new Date()
-            })
+            .update({ status: 'attended', checked_in_at: new Date() })
             .eq('event_id', req.params.id)
             .eq('user_id', targetUserId)
             .select()
             .single();
 
         if (error) throw error;
-
-        res.json({ message: 'Checked in successfully!', registration: data });
+        res.json({ message: 'Checked in!', registration: data });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
